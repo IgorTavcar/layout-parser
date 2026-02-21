@@ -13,10 +13,13 @@
 # limitations under the License.
 
 from io import BytesIO
-from typing import BinaryIO, List, Union, Optional, Dict, Tuple
+from typing import BinaryIO, List, Union, Optional, Dict, Tuple, TYPE_CHECKING
 
 import pdfplumber
 import pandas as pd
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 from ..elements import Layout
 from .basic import load_dataframe
