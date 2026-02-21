@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import patch, MagicMock
+
 import numpy as np
 from layoutparser.elements import Interval, Rectangle, Quadrilateral, TextBlock, Layout
 from layoutparser import load_json, load_dict, load_csv, load_pdf
@@ -83,6 +85,22 @@ def test_pdf():
 def test_empty_pdf():
     pdf_layout = load_pdf("tests/fixtures/io/empty.pdf")
     assert len(pdf_layout) == 1 # Only one page
-    
+
     page_layout = pdf_layout[0]
     assert len(page_layout) == 0 # No selectable tokens on the page
+
+
+def test_pdf_closes_file_handle():
+    with patch("layoutparser.io.pdf.pdfplumber") as mock_pdfplumber:
+        mock_pdf = MagicMock()
+        mock_page = MagicMock()
+        mock_page.width = 100
+        mock_page.height = 200
+        mock_page.extract_words.return_value = []
+        mock_pdf.pages = [mock_page]
+        mock_pdfplumber.open.return_value = mock_pdf
+
+        load_pdf("dummy.pdf")
+
+        mock_pdf.__enter__.assert_called_once()
+        mock_pdf.__exit__.assert_called_once()
