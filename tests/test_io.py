@@ -129,3 +129,17 @@ def test_pdf_with_file_object():
     page_layout = pdf_layout[0]
     for attr_name in ["width", "height", "index"]:
         assert attr_name in page_layout.page_data
+
+
+def test_pdf_page_range():
+    # example.pdf has 1 page, so first_page=1, last_page=1 should return it
+    pdf_layout = load_pdf("tests/fixtures/io/example.pdf", first_page=1, last_page=1)
+    assert len(pdf_layout) == 1
+
+    page_layout = pdf_layout[0]
+    for attr_name in ["width", "height", "index"]:
+        assert attr_name in page_layout.page_data
+
+    # Requesting a page range beyond the document returns empty
+    pdf_layout = load_pdf("tests/fixtures/io/example.pdf", first_page=2)
+    assert len(pdf_layout) == 0

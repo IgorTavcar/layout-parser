@@ -95,6 +95,8 @@ def load_pdf(
     vertical_ttb: bool = True,
     extra_attrs: Optional[List[str]] = None,
     dpi: int = DEFAULT_PDF_DPI,
+    first_page: Optional[int] = None,
+    last_page: Optional[int] = None,
 ) -> Union[List[Layout], Tuple[List[Layout], List["Image.Image"]]]:
     """Load all tokens for each page from a PDF file, and save them
     in a list of Layout objects with the original page order.
@@ -163,6 +165,10 @@ def load_pdf(
             pdf_layouts, it can be rendered appropriately.
             Defaults to `DEFAULT_PDF_DPI=72`, which is also the default rendering dpi
             from the pdfplumber PDF parser.
+        first_page (int, optional):
+            First page to process (1-indexed). Defaults to None (start from first page).
+        last_page (int, optional):
+            Last page to process (1-indexed, inclusive). Defaults to None (process to last page).
 
     Returns:
         List[Layout]:
@@ -188,11 +194,14 @@ def load_pdf(
 
     plumber_pdf_object = pdfplumber.open(filename)
 
+    start = (first_page - 1) if first_page is not None else None
+    end = last_page if last_page is not None else None
+    pages = plumber_pdf_object.pages[start:end]
+
     all_page_layout = []
 
     with plumber_pdf_object:
-        for page_id in range(len(plumber_pdf_object.pages)):
-            cur_page = plumber_pdf_object.pages[page_id]
+        for page_id, cur_page in enumerate(pages, start=(start or 0)):
 
             page_tokens = extract_words_for_page(
                 cur_page,
@@ -218,11 +227,17 @@ def load_pdf(
         import pdf2image
 
         if is_path:
-            pdf_images = pdf2image.convert_from_path(filename, dpi=dpi)
+            pdf_images = pdf2image.convert_from_path(
+                filename, dpi=dpi,
+                first_page=first_page, last_page=last_page,
+            )
         else:
             if isinstance(filename, BytesIO):
                 filename.seek(0)
-            pdf_images = pdf2image.convert_from_bytes(filename.read() if hasattr(filename, 'read') else filename, dpi=dpi)
+            pdf_images = pdf2image.convert_from_bytes(
+                filename.read() if hasattr(filename, 'read') else filename,
+                dpi=dpi, first_page=first_page, last_page=last_page,
+            )
 
         for page_id, page_image in enumerate(pdf_images):
             image_width, image_height = page_image.size
