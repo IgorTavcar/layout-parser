@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Optional, Union, Dict, Any, Tuple, Dict
+from typing import List, Optional, Union, Dict, Any, Tuple
 import functools
 import os
 import sys
@@ -37,7 +37,7 @@ _font_path = os.path.join(_lib_path, "misc", "NotoSerifCJKjp-Regular.otf")
 
 DEFAULT_BOX_WIDTH_RATIO = 0.005
 DEFAULT_OUTLINE_COLOR = "red"
-DEAFULT_COLOR_PALETTE = "#f6bd60-#f7ede2-#f5cac3-#84a59d-#f28482"
+DEFAULT_COLOR_PALETTE = "#f6bd60-#f7ede2-#f5cac3-#84a59d-#f28482"
 # From https://coolors.co/f6bd60-f7ede2-f5cac3-84a59d-f28482
 
 DEFAULT_FONT_PATH = _font_path
@@ -141,7 +141,7 @@ def _create_new_canvas(canvas, arrangement, text_background_color):
 def _create_color_palette(types):
     return {
         type: color
-        for type, color in zip(types, cycle(DEAFULT_COLOR_PALETTE.split("-")))
+        for type, color in zip(types, cycle(DEFAULT_COLOR_PALETTE.split("-")))
     }
 
 
