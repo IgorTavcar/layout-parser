@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Union, Optional, Dict, Tuple
+from io import BytesIO
+from typing import BinaryIO, List, Union, Optional, Dict, Tuple
 
 import pdfplumber
 import pandas as pd
@@ -84,7 +85,7 @@ def extract_words_for_page(
 
 
 def load_pdf(
-    filename: str,
+    filename: Union[str, bytes, BinaryIO],
     load_images: bool = False,
     x_tolerance: int = 1.5,
     y_tolerance: int = 2,
@@ -99,7 +100,8 @@ def load_pdf(
     in a list of Layout objects with the original page order.
 
     Args:
-        filename (str): The path to the PDF file.
+        filename (Union[str, bytes, BinaryIO]): The path to the PDF file,
+            raw bytes, or a binary file-like object.
         load_images (bool, optional):
             Whether load screenshot for each page of the PDF file.
             When set to true, the function will return both the layout and
@@ -180,6 +182,10 @@ def load_pdf(
         >>> lp.draw_box(pdf_images[0], pdf_layout[0])
     """
 
+    is_path = isinstance(filename, str)
+    if isinstance(filename, bytes):
+        filename = BytesIO(filename)
+
     plumber_pdf_object = pdfplumber.open(filename)
 
     all_page_layout = []
@@ -211,7 +217,12 @@ def load_pdf(
     else:
         import pdf2image
 
-        pdf_images = pdf2image.convert_from_path(filename, dpi=dpi)
+        if is_path:
+            pdf_images = pdf2image.convert_from_path(filename, dpi=dpi)
+        else:
+            if isinstance(filename, BytesIO):
+                filename.seek(0)
+            pdf_images = pdf2image.convert_from_bytes(filename.read() if hasattr(filename, 'read') else filename, dpi=dpi)
 
         for page_id, page_image in enumerate(pdf_images):
             image_width, image_height = page_image.size

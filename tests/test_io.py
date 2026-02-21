@@ -104,3 +104,28 @@ def test_pdf_closes_file_handle():
 
         mock_pdf.__enter__.assert_called_once()
         mock_pdf.__exit__.assert_called_once()
+
+
+def test_pdf_with_bytes():
+    with open("tests/fixtures/io/example.pdf", "rb") as f:
+        pdf_bytes = f.read()
+
+    pdf_layout = load_pdf(pdf_bytes)
+    assert len(pdf_layout) == 1
+
+    page_layout = pdf_layout[0]
+    for attr_name in ["width", "height", "index"]:
+        assert attr_name in page_layout.page_data
+
+    assert len(set(ele.type for ele in page_layout)) == 3
+
+
+def test_pdf_with_file_object():
+    with open("tests/fixtures/io/example.pdf", "rb") as f:
+        pdf_layout = load_pdf(f)
+
+    assert len(pdf_layout) == 1
+
+    page_layout = pdf_layout[0]
+    for attr_name in ["width", "height", "index"]:
+        assert attr_name in page_layout.page_data
