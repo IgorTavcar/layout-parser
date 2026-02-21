@@ -14,6 +14,12 @@
 
 import pytest
 
+from layoutparser.file_utils import is_gcv_available
+
+pytestmark = pytest.mark.skipif(
+    not is_gcv_available(), reason="google-cloud-vision not available"
+)
+
 from layoutparser.elements import *
 from layoutparser.ocr import *
 from layoutparser.visualization import *

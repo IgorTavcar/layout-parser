@@ -116,7 +116,7 @@ class GCVAgent(BaseOCRAgent):
             warnings.warn(
                 "The GCV credential has not been set. You could not run the detect command."
             )
-        self._context = _vision.types.ImageContext(language_hints=languages)
+        self._context = _vision.ImageContext(language_hints=languages)
         self.ocr_image_decode_type = ocr_image_decode_type
 
     @classmethod
@@ -130,7 +130,7 @@ class GCVAgent(BaseOCRAgent):
         return cls(**kwargs)
 
     def _detect(self, img_content):
-        img_content = _vision.types.Image(content=img_content)
+        img_content = _vision.Image(content=img_content)
         response = self._client.document_text_detection(
             image=img_content, image_context=self._context
         )
@@ -277,7 +277,7 @@ class GCVAgent(BaseOCRAgent):
         with open(filename, "r") as f:
             data = f.read()
         return _json_format.Parse(
-            data, _vision.types.AnnotateImageResponse(), ignore_unknown_fields=True
+            data, _vision.AnnotateImageResponse(), ignore_unknown_fields=True
         )
 
     def save_response(self, res, file_name):

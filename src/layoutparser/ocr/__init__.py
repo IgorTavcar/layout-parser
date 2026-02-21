@@ -12,5 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .gcv_agent import GCVAgent, GCVFeatureType
-from .tesseract_agent import TesseractAgent, TesseractFeatureType
+from ..file_utils import is_gcv_available, is_pytesseract_available
+
+if is_gcv_available():
+    from .gcv_agent import GCVAgent, GCVFeatureType
+if is_pytesseract_available():
+    from .tesseract_agent import TesseractAgent, TesseractFeatureType

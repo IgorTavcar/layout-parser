@@ -16,6 +16,11 @@ import pytest
 import cv2
 
 from layoutparser import load_json
+from layoutparser.file_utils import (
+    is_detectron2_available,
+    is_paddle_available,
+    is_effdet_available,
+)
 from layoutparser.models import *
 
 ALL_DETECTRON2_MODEL_CONFIGS = [
@@ -80,6 +85,7 @@ def _single_config_test_pipeline(TestLayoutModel, base_config):
             model = TestLayoutModel(config)
 
 
+@pytest.mark.skipif(not is_detectron2_available(), reason="detectron2 not available")
 def test_Detectron2Model(is_large_scale=False):
 
     if is_large_scale:
@@ -99,6 +105,7 @@ def test_Detectron2Model(is_large_scale=False):
     layout = model.detect(image)
 
 
+@pytest.mark.skipif(not is_detectron2_available(), reason="detectron2 not available")
 def test_Detectron2Model_version_compatibility(enabled=False):
 
     if enabled:
@@ -118,6 +125,7 @@ def test_Detectron2Model_version_compatibility(enabled=False):
         )
 
 
+@pytest.mark.skipif(not is_paddle_available(), reason="paddlepaddle not available")
 def test_PaddleDetectionModel(is_large_scale=False):
     """test PaddleDetection model"""
     if is_large_scale:
@@ -133,6 +141,7 @@ def test_PaddleDetectionModel(is_large_scale=False):
         )
 
 
+@pytest.mark.skipif(not is_effdet_available(), reason="effdet not available")
 def test_EffDetModel(is_large_scale=False):
 
     if is_large_scale:
@@ -148,6 +157,10 @@ def test_EffDetModel(is_large_scale=False):
         )
 
 
+@pytest.mark.skipif(
+    not (is_detectron2_available() and is_paddle_available() and is_effdet_available()),
+    reason="not all model backends available",
+)
 def test_AutoModel():
 
     # Full configs

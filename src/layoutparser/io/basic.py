@@ -127,9 +127,9 @@ def load_dataframe(df: pd.DataFrame, block_type: str = None) -> Layout:
     """
     df = df.copy()
     if "points" in df.columns:
-        if df["points"].dtype == object:
+        if pd.api.types.is_string_dtype(df["points"]) or df["points"].dtype == object:
             df["points"] = df["points"].map(
-                lambda x: ast.literal_eval(x) if not pd.isna(x) else x
+                lambda x: ast.literal_eval(x) if isinstance(x, str) else x
             )
 
     if block_type is None:
@@ -145,4 +145,4 @@ def load_dataframe(df: pd.DataFrame, block_type: str = None) -> Layout:
         if "id" not in df.columns:
             df["id"] = df.index
             
-    return load_dict(df.apply(lambda x: x.dropna().to_dict(), axis=1).to_list())
+    return load_dict(df.apply(lambda x: {k: v for k, v in x.items() if not (isinstance(v, float) and pd.isna(v))}, axis=1).to_list())

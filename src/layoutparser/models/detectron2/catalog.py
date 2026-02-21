@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from iopath.common.file_io import PathHandler
-
-from ..base_catalog import PathManager
+from ..base_catalog import PathHandler, PathManager
 
 MODEL_CATALOG = {
     "HJDataset": {

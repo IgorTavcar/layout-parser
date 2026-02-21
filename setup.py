@@ -33,7 +33,7 @@ setup(name         = "layoutparser",
       description  = "A unified toolkit for Deep Learning Based Document Image Analysis",
       long_description=open("README.md", "r", encoding="utf-8").read(),
       long_description_content_type="text/markdown",
-      python_requires='>=3.6',
+      python_requires='>=3.10',
       install_requires=[
         "numpy", 
         "opencv-python",
@@ -41,17 +41,17 @@ setup(name         = "layoutparser",
         "pandas",
         "pillow",
         "pyyaml>=5.1",
-        "iopath",
+        "pooch",
         "pdfplumber @ git+https://github.com/IgorTavcar/pdfplumber.git",
         "pdf2image",
       ],
       extras_require={
         "ocr": [
-          'google-cloud-vision==1',
+          'google-cloud-vision>=3.1',
           'pytesseract'
         ], 
         "gcv": [
-          'google-cloud-vision==1',
+          'google-cloud-vision>=3.1',
         ],
         "tesseract": [
           'pytesseract'
@@ -67,7 +67,7 @@ setup(name         = "layoutparser",
           "effdet"
         ],
         "paddledetection": [
-          "paddlepaddle==2.1.0"
+          "paddlepaddle>=2.1.0"
         ],
       },
       include_package_data=True

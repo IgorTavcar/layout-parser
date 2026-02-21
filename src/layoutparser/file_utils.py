@@ -16,19 +16,13 @@
 # https://github.com/huggingface/transformers/blob/master/src/transformers/file_utils.py
 
 from typing import Any, BinaryIO, Dict, List, Optional, Tuple, Union
-import sys
 import os
 import logging
 import importlib.util
+import importlib.metadata as importlib_metadata
 from types import ModuleType
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-# The package importlib_metadata is in a different place, depending on the python version.
-if sys.version_info < (3, 8):
-    import importlib_metadata
-else:
-    import importlib.metadata as importlib_metadata
 
 ###########################################
 ############ Layout Model Deps ############
@@ -151,7 +145,7 @@ PYTESSERACT_IMPORT_ERROR = """
 
 GCV_IMPORT_ERROR = """
 {0} requires the Google Cloud Vision Python utils but it was not found in your environment. You can install it with pip:
-`pip install google-cloud-vision==1`
+`pip install google-cloud-vision>=3.1`
 """
 
 BACKENDS_MAPPING = dict(

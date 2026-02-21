@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from layoutparser import (
-    GCVAgent,
-    GCVFeatureType,
-    TesseractAgent,
-    TesseractFeatureType,
-)
 import json, cv2, os
+import pytest
+
+from layoutparser.file_utils import is_gcv_available, is_pytesseract_available
 
 image = cv2.imread("tests/fixtures/ocr/test_gcv_image.jpg")
 
 
+@pytest.mark.skipif(not is_gcv_available(), reason="google-cloud-vision not available")
 def test_gcv_agent(test_detect=False):
+    from layoutparser.ocr.gcv_agent import GCVAgent, GCVFeatureType
 
     # Test loading the agent with designated credential
     ocr_agent = GCVAgent()
@@ -56,7 +55,9 @@ def test_gcv_agent(test_detect=False):
     os.remove("tests/fixtures/ocr/.test_gcv_response.json")
 
 
+@pytest.mark.skipif(not is_pytesseract_available(), reason="pytesseract not available")
 def test_tesseract(test_detect=False):
+    from layoutparser.ocr.tesseract_agent import TesseractAgent, TesseractFeatureType
 
     ocr_agent = TesseractAgent(languages="eng")
     res = ocr_agent.load_response("tests/fixtures/ocr/test_tesseract_response.pickle")

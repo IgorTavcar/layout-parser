@@ -12,34 +12,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from iopath.common.file_io import HTTPURLHandler
-from iopath.common.file_io import PathManager as PathManagerBase
+import os
 
-# A trick learned from https://github.com/facebookresearch/detectron2/blob/65faeb4779e4c142484deeece18dc958c5c9ad18/detectron2/utils/file_io.py#L3
+import pooch
 
 
-class DropboxHandler(HTTPURLHandler):
-    """
-    Supports download and file check for dropbox links
-    """
+_CACHE_DIR = os.path.join(os.path.expanduser("~"), ".cache", "layoutparser")
 
-    def _get_supported_prefixes(self):
-        return ["https://www.dropbox.com"]
 
-    def _isfile(self, path):
-        return path in self.cache_map
-
-class HuggingfaceHandler(HTTPURLHandler):
-    """
-    Supports download and file check for Huggingface links
-    """
+class PathHandler:
+    """Minimal base class replacing iopath.common.file_io.PathHandler."""
 
     def _get_supported_prefixes(self):
-        return ["https://huggingface.co"]
+        return []
 
-    def _isfile(self, path):
-        return path in self.cache_map
+    def _get_local_path(self, path, **kwargs):
+        raise NotImplementedError
 
-PathManager = PathManagerBase()
-PathManager.register_handler(DropboxHandler())
-PathManager.register_handler(HuggingfaceHandler())
+    def _open(self, path, mode="r", **kwargs):
+        raise NotImplementedError
+
+
+class _PathManager:
+    def __init__(self):
+        self._handlers = {}
+
+    def register_handler(self, handler):
+        for prefix in handler._get_supported_prefixes():
+            self._handlers[prefix] = handler
+
+    def get_local_path(self, path, **kwargs):
+        for prefix, handler in self._handlers.items():
+            if path.startswith(prefix):
+                return handler._get_local_path(path, **kwargs)
+
+        # Default: HTTP(S) download via pooch
+        if path.startswith("http://") or path.startswith("https://"):
+            os.makedirs(_CACHE_DIR, exist_ok=True)
+            return pooch.retrieve(
+                url=path,
+                known_hash=None,
+                path=_CACHE_DIR,
+            )
+
+        # Local path
+        return path
+
+    def open(self, path, mode="r", **kwargs):
+        local = self.get_local_path(path)
+        return open(local, mode, **kwargs)
+
+
+PathManager = _PathManager()
