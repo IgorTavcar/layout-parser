@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from typing import Union
+from functools import partial
 from PIL import Image
 import numpy as np
 import warnings
@@ -23,6 +24,7 @@ from ...elements import Rectangle, TextBlock, Layout
 from ...file_utils import is_torch_cuda_available, is_detectron2_available
 
 if is_detectron2_available():
+    import torch
     import detectron2.engine
     import detectron2.config
 
@@ -119,7 +121,15 @@ class Detectron2LayoutModel(BaseLayoutModel):
         self._create_model()
 
     def _create_model(self):
-        self.model = detectron2.engine.DefaultPredictor(self.cfg)
+        # detectron2's checkpoint loader doesn't yet support torch.load's
+        # weights_only=True default (torch >= 2.6). Temporarily patch it
+        # so model loading succeeds.
+        _orig = torch.load
+        torch.load = partial(_orig, weights_only=False)
+        try:
+            self.model = detectron2.engine.DefaultPredictor(self.cfg)
+        finally:
+            torch.load = _orig
 
     def gather_output(self, outputs):
 

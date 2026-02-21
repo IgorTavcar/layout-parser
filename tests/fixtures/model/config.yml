@@ -262,7 +262,7 @@ MODEL:
     NAME: SemSegFPNHead
     NORM: GN
     NUM_CLASSES: 54
-  WEIGHTS: https://www.dropbox.com/s/3hafewz6wcvev04/model_final.pth?dl=1
+  WEIGHTS: https://huggingface.co/layoutparser/detectron2/resolve/main/HJDataset/faster_rcnn_R_50_FPN_3x/model_final.pth
 OUTPUT_DIR: ./train_log/faster_rcnn_R_50_FPN_3x
 SEED: -1
 SOLVER:

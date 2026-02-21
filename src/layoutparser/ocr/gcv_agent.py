@@ -25,7 +25,6 @@ from ..elements import Layout, TextBlock, Quadrilateral, TextBlock
 from ..file_utils import is_gcv_available
 
 if is_gcv_available():
-    import google.protobuf.json_format as _json_format
     import google.cloud.vision as _vision
 
 
@@ -276,13 +275,13 @@ class GCVAgent(BaseOCRAgent):
     def load_response(self, filename):
         with open(filename, "r") as f:
             data = f.read()
-        return _json_format.Parse(
-            data, _vision.AnnotateImageResponse(), ignore_unknown_fields=True
+        return _vision.AnnotateImageResponse.from_json(
+            data, ignore_unknown_fields=True
         )
 
     def save_response(self, res, file_name):
-        res = _json_format.MessageToJson(res)
+        res_json = type(res).to_json(res)
 
         with open(file_name, "w") as f:
-            json_file = json.loads(res)
+            json_file = json.loads(res_json)
             json.dump(json_file, f)
