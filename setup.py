@@ -42,7 +42,7 @@ setup(name         = "layoutparser",
         "pillow",
         "pyyaml>=5.1",
         "iopath",
-        "pdfplumber",
+        "pdfplumber @ git+https://github.com/IgorTavcar/pdfplumber.git",
         "pdf2image",
       ],
       extras_require={
